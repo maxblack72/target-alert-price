@@ -9,3 +9,8 @@ Checkbox can be disabled/enabled also manually
 ### Enable trigger 
 
 Enable trigger on "checkPrices" function 
+
+### Todo
+
+- Add better and extensive documentation
+- Add unit tests

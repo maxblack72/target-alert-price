@@ -4,5 +4,8 @@
   "main": "index.js",
   "repository": "git@github.com:maxblack72/target-alert-price.git",
   "author": "Max Rosorani <m.rosorani@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.6.2"
+  }
 }
