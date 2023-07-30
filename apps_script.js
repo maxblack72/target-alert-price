@@ -9,9 +9,13 @@ const columnEmailSent             = 7;
 
 let bodyMessage = '';
 let sendMessage = false;
-let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Prices");
+
+function getSheetByName(name) {
+  return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
+}
 
 function AddStrategyRowToEmail(row, i) {
+  let sheet = getSheetByName('Prices');
   sendMessage = true;
   bodyMessage += `<strong>${row[columnName]}</strong>: current price is €${row[columnCurrentPrice].toFixed(2)} 
     and your strategy is ${row[columnStrategy].toUpperCase()}<br>`;
@@ -31,6 +35,7 @@ function AddPercentageRowToEmail(row, i) {
 
 function checkPrices() {
   // Pulls data from the spreadsheet
+  let sheet = getSheetByName('Prices');
   let source = sheet.getRange("A:H");
   let data = source.getValues();
 
@@ -85,3 +90,6 @@ function sendEmail(bodyMessage) {
     htmlBody: intro + bodyMessage,
   });
 }
+
+global.checkPrices = checkPrices;
+global.getSheetByName = getSheetByName;
