@@ -13,7 +13,6 @@ let sendMessage = false;
 let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Prices");
 
 function addStrategyRowToEmail(row, i) {
-  console.log("OK2");
   sendMessage = true;
   bodyMessage += `<strong>${row[columnName]}</strong>: there is a ${row[columnSignal].toUpperCase()} signal since 
     current price is €${row[columnCurrentPrice].toFixed(2)}<br>`;
@@ -23,17 +22,12 @@ function addStrategyRowToEmail(row, i) {
 }
 
 function addPercentageRowToEmail(row, i) {
-  console.log("OK3");
   sendMessage = true;
   bodyMessage += `<strong>${row[columnName]}</strong>: current price is €${row[columnCurrentPrice].toFixed(2)} 
     and is ${row[columnTargetPercentage]*100}% around your target price<br>`;
   i++;
   // stop sending message after the first one
   sheet.getRange(`H${i}`).setValue(true);
-}
-
-function mySum(x) {
-  return 2+x;
 }
 
 function checkPrices() {
@@ -60,27 +54,27 @@ function checkPrices() {
     if (row[columnSignal] == 'Buy') {
       // if price is lower than target price
       if (row[columnCurrentPrice] <= row[columnTargetPrice]) {
-        addStrategyRowToEmail(row, i);
+        this.addStrategyRowToEmail(row, i);
         continue;
       }   
     } else if (row[columnSignal] == 'Sell') {
       // if price is upper than target price
       if (row[columnCurrentPrice] >= row[columnTargetPrice]) {
-        addStrategyRowToEmail(row, i);
+        this.addStrategyRowToEmail(row, i);
         continue;
       }
     }
 
     // if currente percentage diff is around target percentage
     if (Math.abs(row[columnCurrentDiffPercentage]) < row[columnTargetPercentage]) {
-        global.addPercentageRowToEmail(row, i);
+        this.addPercentageRowToEmail(row, i);
         continue;
     }
   }
 
   if (!sendMessage) return;
 
-  sendEmail(bodyMessage);
+  this.sendEmail(bodyMessage);
 }
 
 function sendEmail(bodyMessage) {
@@ -93,8 +87,7 @@ function sendEmail(bodyMessage) {
   });
 }
 
-global.checkPrices = checkPrices;
-// global.addStrategyRowToEmail = addStrategyRowToEmail;
-// global.addPercentageRowToEmail = addPercentageRowToEmail;
-// global.sendEmail = sendEmail;
-// global.mySum = mySum;
+// uncomment this line for local testing
+// module.exports = {
+//   checkPrices
+// }

@@ -25,17 +25,11 @@ global.columnCurrentPrice          = 5;
 global.columnCurrentDiffPercentage = 6;
 global.columnEmailSent             = 7;
 
+let {
+  checkPrices
+} = require('../apps_script');
 
-
-require('../apps_script');
-
-// // Create a mock for the entire module
-// jest.mock('../apps_script', () => ({
-//   addStrategyRowToEmail: jest.fn(),
-//   addPercentageRowToEmail: jest.fn(),
-//   sendEmail: jest.fn(),
-// }));
-addPercentageRowToEmail = jest.fn((row, i) => null)
+// console.log(addPercentageRowToEmail.toString());
 
 describe('checkPrices', () => {
   afterEach(() => {
@@ -48,10 +42,13 @@ describe('checkPrices', () => {
 
   test('should pull data from the "Prices" sheet', () => {
     // Call the checkPrices to be tested
-    checkPrices();
     // console.log(addPercentageRowToEmail.toString());
+    const mockAddPercentageRowToEmail = jest.fn((row, i) => null);
+    addPercentageRowToEmail = mockAddPercentageRowToEmail;
 
-    expect(addPercentageRowToEmail).toHaveBeenCalled();
+    // addPercentageRowToEmail(); //esegue la moccata ( il test diventa ok)
+    checkPrices(); // non esegue la moccata ma l'originale
+    expect(mockAddPercentageRowToEmail).toHaveBeenCalled();
   });
 });
 
