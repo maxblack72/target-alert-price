@@ -1,62 +1,57 @@
-// index.test.js
-
-var gas = require('gas-local');
-//pick default mock object
-var defMock = gas.globalMockDefault;
-//Mock MailApp by extending default mock object
-var customMock = { 
-  SpreadsheetApp: { getActiveSpreadsheet: function () { return 50; } },
-     __proto__: defMock 
-  };
-//pass it to require
-const { checkPrices } = gas.require('../apps_script.js', customMock);
-
 // Import the function you want to test
-// const { checkPrices } = require('../apps_script');
+global.SpreadsheetApp = {
+  getActiveSpreadsheet: () => ({
+    getOwner: () => ({
+      getEmail: jest.fn((name) => null)
+    }),
+    getSheetByName: (name) => ({
+      getRange: (range) => ({
+        getValues: jest.fn((name) => [
+          [],
+          ['Etherium', 'ETH-EUR',  999, 5.00, 'Buy', 1000, 1.3, false],
+          // ['Palantir', 'NYSE:PLTR',	14.30,  3.00,	'Buy',	19.98,	39.72,	false]
+        ]),
+        setValue: jest.fn((boolValue) => true)
+      })
+    }),
+  }),
+};
+global.columnName                  = 0;
+global.columnTicker                = 1;
+global.columnTargetPrice           = 2;
+global.columnTargetPercentage      = 3;
+global.columnStrategy              = 4;
+global.columnCurrentPrice          = 5;
+global.columnCurrentDiffPercentage = 6;
+global.columnEmailSent             = 7;
 
 
-// Mock the getSheetByName function
-global.getSheetByName = jest.fn((name) => {
-  // Here, you can define the behavior of the mock function for different inputs.
-  // For example, you can return different mocked sheets based on the name input.
-  if (name === 'Prices') {
-    return {
-      getRange: jest.fn(() => ({
-        getValue: jest.fn(() => 42), // Mock the return value here
-      })),
-    };
-  } else if (name === 'OtherSheet') {
-    // Add another mocked sheet behavior here if needed.
-    // You can customize the behavior of different sheets depending on your test cases.
-  }
 
-  // Return null or undefined for any other cases.
-  return null;
-});
+require('../apps_script');
+
+// // Create a mock for the entire module
+// jest.mock('../apps_script', () => ({
+//   addStrategyRowToEmail: jest.fn(),
+//   addPercentageRowToEmail: jest.fn(),
+//   sendEmail: jest.fn(),
+// }));
+addPercentageRowToEmail = jest.fn((row, i) => null)
 
 describe('checkPrices', () => {
+  afterEach(() => {
+  });
+  beforeEach(() => {
+    global.MailApp = {
+      sendEmail: jest.fn((body) => null)
+    };
+	});
+
   test('should pull data from the "Prices" sheet', () => {
-    // Mock the 'getValues' method of the 'getRange' method of the 'sheet' object
-    const mockGetValues = jest.fn();
-    const mockGetRange = jest.fn(() => ({ getValues: mockGetValues }));
-
-    // Mock the return values of the 'getValues' method
-    const mockData = [
-      ['Product A', 10, '$100'],
-      ['Product B', 5, '$50'],
-      ['Product C', 3, '$30'],
-      // Add more data rows as needed for your specific test case
-    ];
-    mockGetValues.mockReturnValueOnce(mockData);
-
-    // console.log(checkPrices);
     // Call the checkPrices to be tested
-    global.checkPrices();
+    checkPrices();
+    // console.log(addPercentageRowToEmail.toString());
 
-    // Assert that the function does what it is supposed to do with the data
-    // For example, you can expect the result to have a specific format or behavior
-    // based on the data you provided.
-    // expect(result).toBe(/* your expectation here */);
+    expect(addPercentageRowToEmail).toHaveBeenCalled();
   });
 });
 

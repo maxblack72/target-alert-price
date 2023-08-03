@@ -2,29 +2,28 @@ const columnName                  = 0;
 const columnTicker                = 1;
 const columnTargetPrice           = 2;
 const columnTargetPercentage      = 3;
-const columnStrategy              = 4;
+const columnSignal                = 4;
 const columnCurrentPrice          = 5;
 const columnCurrentDiffPercentage = 6;
 const columnEmailSent             = 7;
 
 let bodyMessage = '';
-let sendMessage = false;
+// a message may have multiple items/stock 
+let sendMessage = false; 
+let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Prices");
 
-function getSheetByName(name) {
-  return SpreadsheetApp.getActiveSpreadsheet().getSheetByName(name);
-}
-
-function AddStrategyRowToEmail(row, i) {
-  let sheet = getSheetByName('Prices');
+function addStrategyRowToEmail(row, i) {
+  console.log("OK2");
   sendMessage = true;
-  bodyMessage += `<strong>${row[columnName]}</strong>: current price is €${row[columnCurrentPrice].toFixed(2)} 
-    and your strategy is ${row[columnStrategy].toUpperCase()}<br>`;
+  bodyMessage += `<strong>${row[columnName]}</strong>: there is a ${row[columnSignal].toUpperCase()} signal since 
+    current price is €${row[columnCurrentPrice].toFixed(2)}<br>`;
   i++;
   // stop sending message after the first one
   sheet.getRange(`H${i}`).setValue(true);
 }
 
-function AddPercentageRowToEmail(row, i) {
+function addPercentageRowToEmail(row, i) {
+  console.log("OK3");
   sendMessage = true;
   bodyMessage += `<strong>${row[columnName]}</strong>: current price is €${row[columnCurrentPrice].toFixed(2)} 
     and is ${row[columnTargetPercentage]*100}% around your target price<br>`;
@@ -33,9 +32,12 @@ function AddPercentageRowToEmail(row, i) {
   sheet.getRange(`H${i}`).setValue(true);
 }
 
+function mySum(x) {
+  return 2+x;
+}
+
 function checkPrices() {
   // Pulls data from the spreadsheet
-  let sheet = getSheetByName('Prices');
   let source = sheet.getRange("A:H");
   let data = source.getValues();
 
@@ -55,23 +57,23 @@ function checkPrices() {
     if (row[columnEmailSent]) continue;
 
     // DEPENDING ON THE STRATEGY
-    if (row[columnStrategy] == 'Lower than') {
+    if (row[columnSignal] == 'Buy') {
       // if price is lower than target price
       if (row[columnCurrentPrice] <= row[columnTargetPrice]) {
-        AddStrategyRowToEmail(row, i);
+        addStrategyRowToEmail(row, i);
         continue;
       }   
-    } else if (row[columnStrategy] == 'Upper than') {
+    } else if (row[columnSignal] == 'Sell') {
       // if price is upper than target price
       if (row[columnCurrentPrice] >= row[columnTargetPrice]) {
-        AddStrategyRowToEmail(row, i);
+        addStrategyRowToEmail(row, i);
         continue;
       }
     }
 
     // if currente percentage diff is around target percentage
     if (Math.abs(row[columnCurrentDiffPercentage]) < row[columnTargetPercentage]) {
-        AddPercentageRowToEmail(row, i);
+        global.addPercentageRowToEmail(row, i);
         continue;
     }
   }
@@ -92,4 +94,7 @@ function sendEmail(bodyMessage) {
 }
 
 global.checkPrices = checkPrices;
-global.getSheetByName = getSheetByName;
+// global.addStrategyRowToEmail = addStrategyRowToEmail;
+// global.addPercentageRowToEmail = addPercentageRowToEmail;
+// global.sendEmail = sendEmail;
+// global.mySum = mySum;
