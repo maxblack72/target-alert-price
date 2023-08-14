@@ -1,4 +1,10 @@
 // Import the function you want to test
+
+const test1 = ['Etherium', 'ETH-EUR',  800, 4.00, 'Buy', 1000, 1.8, false];
+const test2 = ['Etherium', 'ETH-EUR',  1000, 4.00, 'Sell', 1500, 50, false];
+const test3 = ['Etherium', 'ETH-EUR',  500, 4.00, 'Buy', 1000, 50, false];
+const test4 = ['Etherium', 'ETH-EUR',  500, 4.00, 'Buy', 1000, 50, false];
+
 global.SpreadsheetApp = {
   getActiveSpreadsheet: () => ({
     getOwner: () => ({
@@ -7,16 +13,17 @@ global.SpreadsheetApp = {
     getSheetByName: (name) => ({
       getRange: (range) => ({
         getValues: jest.fn((name) => [
-          [],
-          ['Etherium', 'ETH-EUR',  800, 4.00, 'Buy', 1000, 1.8, false],
-          // ['Etherium', 'ETH-EUR',  800, 5.00, 'Sell', 1000, 10, false],
+          ['headings'],
+          test1,
+          test2,
+          test3,
+          test4
         ]),
         setValue: jest.fn((boolValue) => true)
       })
     }),
   }),
 };
-
 
 global.columnName                  = 0;
 global.columnTicker                = 1;
@@ -48,23 +55,14 @@ describe('checkPrices', () => {
     // console.log(addPercentageRowToEmail.toString());
     const mockAddPercentageRowToEmail = jest.fn((row, i) => null);
     addPercentageRowToEmail = mockAddPercentageRowToEmail;
+    const mockAddStrategyRowToEmail = jest.fn((row, i) => null);
+    addStrategyRowToEmail = mockAddStrategyRowToEmail;
 
     // addPercentageRowToEmail(); //esegue la moccata ( il test diventa ok)
     checkPrices(); // non esegue la moccata ma l'originale
-    expect(mockAddPercentageRowToEmail).toHaveBeenCalled();
+    expect(mockAddPercentageRowToEmail).toHaveBeenCalledWith(test1, '1');
+    expect(mockAddStrategyRowToEmail).toHaveBeenCalledWith(test2, '2');
   });
-
-
-  // test('should pull data from the "Prices" sheet1', () => {
-  //   // Call the checkPrices to be tested
-  //   // console.log(addPercentageRowToEmail.toString());
-  //   const mockAddStrategyRowToEmail = jest.fn((row, i) => null);
-  //   addStrategyRowToEmail = mockAddStrategyRowToEmail;
-
-  //   // addPercentageRowToEmail(); //esegue la moccata ( il test diventa ok)
-  //   checkPrices(); // non esegue la moccata ma l'originale
-  //   expect(mockAddStrategyRowToEmail).toHaveBeenCalled();
-  // });
 
 });
 

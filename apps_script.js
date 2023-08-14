@@ -1,3 +1,5 @@
+// LONG TERM PRICE CHECK
+
 const columnName                  = 0;
 const columnTicker                = 1;
 const columnTargetPrice           = 2;
