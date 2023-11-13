@@ -7,7 +7,8 @@ const columnTargetPercentage      = 3;
 const columnSignal                = 4;
 const columnCurrentPrice          = 5;
 const columnCurrentDiffPercentage = 6;
-const columnEmailSent             = 7;
+const columnSparkeline            = 7; // not used
+const columnEmailSent             = 8;
 
 let bodyMessage = '';
 // a message may have multiple items/stock 
@@ -29,12 +30,12 @@ function addPercentageRowToEmail(row, i) {
     and is ${row[columnTargetPercentage]*100}% around your target price<br>`;
   i++;
   // stop sending message after the first one
-  sheet.getRange(`H${i}`).setValue(true);
+  sheet.getRange(`I${i}`).setValue(true);
 }
 
 function checkPrices() {
   // Pulls data from the spreadsheet
-  let source = sheet.getRange("A:H");
+  let source = sheet.getRange("A:I");
   let data = source.getValues();
 
   //Loops through the cells in the spreadsheet to find cells where the stock fell below purchase price
