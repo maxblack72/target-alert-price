@@ -11,7 +11,16 @@
 4. Make a few test changing the columns C and D 
 
 ### Google Sheet configuration
+
 ![](google_sheets_image.png)
 
 Blue fields needs to be filled by the user, white ones are manager automatically.
 Checkbox can be disabled/enabled also manually
+
+## Testing
+
+Testing can be done locally.
+
+1. uncomment last 3 lines to export the module
+2. run `yarn test`
+s

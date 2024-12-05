@@ -4,28 +4,33 @@ const columnName                  = 0;
 const columnTicker                = 1;
 const columnTargetPrice           = 2;
 const columnTargetPercentage      = 3;
-const columnSignal                = 4;
+const columnSignal                = 4; // Sell, Buy, Stop Loss
 const columnCurrentPrice          = 5;
 const columnCurrentDiffPercentage = 6;
 const columnSparkeline            = 7; // not used
 const columnEmailSent             = 8;
+const columnYFlink                = 9; // Link
+const sheeetTab                   = "Prices";
 
 let bodyMessage = '';
+let emailSignal = '';
 // a message may have multiple items/stock 
 let sendMessage = false; 
-let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Prices");
+let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheeetTab);
 
 function addStrategyRowToEmail(row, i) {
   sendMessage = true;
+  emailSignal = row[columnSignal].toLowerCase() || '';
   bodyMessage += `<strong>${row[columnName]}</strong>: there is a ${row[columnSignal].toUpperCase()} signal since 
     current price is €${row[columnCurrentPrice].toFixed(2)}<br>`;
   i++;
   // stop sending message after the first one
-  sheet.getRange(`H${i}`).setValue(true);
+  sheet.getRange(`I${i}`).setValue(true);
 }
 
 function addPercentageRowToEmail(row, i) {
   sendMessage = true;
+  emailSignal = row[columnSignal].toLowerCase() || '';
   bodyMessage += `<strong>${row[columnName]}</strong>: current price is €${row[columnCurrentPrice].toFixed(2)} 
     and is ${row[columnTargetPercentage]*100}% around your target price<br>`;
   i++;
@@ -54,7 +59,7 @@ function checkPrices() {
     if (row[columnEmailSent]) continue;
 
     // DEPENDING ON THE STRATEGY
-    if (row[columnSignal] == 'Buy') {
+    if (row[columnSignal] == 'Buy' || row[columnSignal] == 'Stop Loss') {
       // if price is lower than target price
       if (row[columnCurrentPrice] <= row[columnTargetPrice]) {
         this.addStrategyRowToEmail(row, i);
@@ -68,7 +73,7 @@ function checkPrices() {
       }
     }
 
-    // if currente percentage diff is around target percentage
+    // if current percentage diff is around target percentage
     if (Math.abs(row[columnCurrentDiffPercentage]) < row[columnTargetPercentage]) {
         this.addPercentageRowToEmail(row, i);
         continue;
@@ -85,12 +90,12 @@ function sendEmail(bodyMessage) {
   // console.log(intro + bodyMessage)
   MailApp.sendEmail({
     to: SpreadsheetApp.getActiveSpreadsheet().getOwner().getEmail(),
-    subject: "Target price alert",
+    subject: "Target price alert: "+  emailSignal,
     htmlBody: intro + bodyMessage,
   });
 }
 
 // uncomment this line for local testing
-// module.exports = {
-//   checkPrices
-// }
+module.exports = {
+  checkPrices
+}
